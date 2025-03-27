@@ -18,11 +18,11 @@ Descripcion de los parametros del fichero `config.ini`:
 - **Sitioweb**. *Por defecto vacio*. Este campo se puede repetir, sirve para crear un array con los sitios a monitorizar.
 
 ### Changelog:
-**v0.1**. Version inicial.
-**v0.2**. La configuracion se relee de forma automatica.
-**v0.3**. Se incluye el modo debug.
-**v0.4**. Se documenta mejor el codigo.
-      Se mejoran los mensajes del modo debug.
-      Se modifica el texto a grabar en el log.
-      Se incluye la escritura del mensaje en el visor de eventos.
-**v0.5**. Se mejora la salida del modo debug.
+- **v0.1**. Version inicial.
+- **v0.2**. La configuracion se relee de forma automatica.
+- **v0.3**. Se incluye el modo debug.
+- **v0.4**. Se documenta mejor el codigo.
+    Se mejoran los mensajes del modo debug.
+    Se modifica el texto a grabar en el log.
+    Se incluye la escritura del mensaje en el visor de eventos.
+- **v0.5**. Se mejora la salida del modo debug.
