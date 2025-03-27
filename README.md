@@ -1,5 +1,5 @@
 # Monitor de Websites
-## (c)2025 Josema
+## &copy;2025 Josema
 
 Script que monitoriza ventanas abiertas y alerta si encuentra ventanas con el
 texto especificado.
