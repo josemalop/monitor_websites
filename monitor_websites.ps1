@@ -1,19 +1,6 @@
 <##############################################################################
 Monitor de Websites v0.5
 (c)2025 Josema
-###############################################################################
-Script que monitoriza ventanas abiertas y alerta si encuentra ventanas con el
-texto especificado.
-###############################################################################
-Changelog:
-v0.1. Version inicial.
-v0.2. La configuracion se relee de forma automatica.
-v0.3. Se incluye el modo debug.
-v0.4. Se documenta mejor el codigo.
-      Se mejoran los mensajes del modo debug.
-      Se modifica el texto a grabar en el log.
-      Se incluye la escritura del mensaje en el visor de eventos.
-v0.5. Se mejora la salida del modo debug.
 ##############################################################################>
 
 # El archivo de configuracion y el de log estaran en el mismo directorio que el script
