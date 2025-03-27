@@ -22,7 +22,7 @@ Descripcion de los parametros del fichero `config.ini`:
 - **v0.2**. La configuracion se relee de forma automatica.
 - **v0.3**. Se incluye el modo debug.
 - **v0.4**. Se documenta mejor el codigo.
-    Se mejoran los mensajes del modo debug.
-    Se modifica el texto a grabar en el log.
-    Se incluye la escritura del mensaje en el visor de eventos.
+    - Se mejoran los mensajes del modo debug.
+    - Se modifica el texto a grabar en el log.
+    - Se incluye la escritura del mensaje en el visor de eventos.
 - **v0.5**. Se mejora la salida del modo debug.
