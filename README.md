@@ -33,6 +33,7 @@ En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`
 - **Debug**. *Por defecto a 0*. Si vale 1, se mostrar&aacute;n los valores configurados y las alertas por pantalla.
 - **TiempoEspera**. *Por defecto a 15*. Tiempo de espera en segundos entre cada monitorizaci&oacute;n.
 - **Sonar**. *Por defecto a 1*. Si vale 1, el altavoz del PC emitira un sonido en cada alerta.
+- **CerrarVentanas**. *Por defecto a 0*. Si vale 1, se cierra la ventana detectada.
 - **FrecSonido**. *Por defecto a 1000*. La frecuencia del sonido en Herzios.
 - **DuracSonido**. *Por defecto a 1000*. La duraci&oacute;n del sonido en milisegundos.
 - **Sitioweb**. *Por defecto vacio*. Este campo se puede repetir, sirve para crear un array con los sitios a monitorizar.
