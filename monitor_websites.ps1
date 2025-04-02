@@ -1,5 +1,5 @@
 <##############################################################################
-Monitor de Websites v0.5
+Monitor de Websites v0.6
 (c)2025 Josema
 ##############################################################################>
 
@@ -20,11 +20,12 @@ $usuario = $env:USERNAME
 # Valores por defecto
 $debug = 0
 $waitTime = 15
-$sonar = 1
+$sonar = 0
 $frecSonido = 1000
 $duracSonido = 1000
 $websites = @()
 $configmostrada = 0
+$cerrarVentanas = 0
 
 # Funcion para leer archivos INI simples
 function Get-IniContent {
@@ -112,6 +113,11 @@ while ($true) {
         if ($settings.ContainsKey("Sitioweb")) {
             $websites = $settings["Sitioweb"]
         }
+
+        # Obtenemos si se tienen que cerrar las ventanas detectadas
+        if ($settings.ContainsKey("CerrarVentanas")) {
+            $cerrarVentanas = [int]$settings["CerrarVentanas"]
+        }
     }
 
     # Mostramos la configuracion cargada si la variable debug es 1
@@ -123,6 +129,7 @@ while ($true) {
         } else {
             Write-Host "No se reproducira ningun sonido."
         }
+        Write-Host "Cerrar ventanas: $cerrarVentanas."
         Write-Host "Sitios web a monitorizar:"
         $websites | ForEach-Object { Write-Host "- $_" }
         $configmostrada = 1
@@ -134,12 +141,14 @@ while ($true) {
     }
 
 
-    # Obtenemos los titulos de las ventanas abiertas
-    $openWindows = Get-Process | Where-Object { $_.MainWindowTitle -ne "" } | Select-Object MainWindowTitle
+    # Obtenemos los procesos con ventanas abiertas
+    $processes = Get-Process | Where-Object { $_.MainWindowTitle -ne "" }
 
-    # Verificamos cada ventana
+    # Verificamos cada sitio web en los títulos de ventana
     foreach ($site in $websites) {
-        if ($openWindows -match $site) {
+        $matchingProcesses = $processes | Where-Object { $_.MainWindowTitle -match $site }
+        
+        if ($matchingProcesses) {
             # Emitimos un sonido usando el PC speaker
             if ($sonar -eq 1) {
                 [console]::Beep($frecSonido, $duracSonido)
@@ -148,11 +157,10 @@ while ($true) {
             # Registramos la fecha, hora y el sitio web en el archivo de log
             $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
             $mensaje = "Equipo: $hostname - IP: $direccionIp - Usuario: $usuario - Web: $site"
-            $logMessage = "[$timestamp] - $mensaje"
+            $logMessage = "[$timestamp] - $mensaje - Acción: $(if ($cerrarVentanas -eq 1) {'Ventana cerrada'} else {'Detectada'})"
             Add-Content -Path $logFile -Value $logMessage
             
-            # Verificamos/creamos la fuente de eventos (solo necesita hacerse una vez, 
-            # con permisos de admin)
+            # Verificamos/creamos la fuente de eventos
             if (-not [System.Diagnostics.EventLog]::SourceExists("MonitorWebsites")) {
                 New-EventLog -LogName "Application" -Source "MonitorWebsites"
             }
@@ -163,6 +171,26 @@ while ($true) {
             # Opcional: Mostramos en la consola
             if ($debug -eq 1) {
                 Write-Host "Alerta: $logMessage"
+            }
+
+            # Cerramos ventanas si esta activada la opcion
+            if ($cerrarVentanas -eq 1) {
+                foreach ($proc in $matchingProcesses) {
+                    try {
+                        $proc.CloseMainWindow() | Out-Null
+                        Start-Sleep -Milliseconds 500
+                        if (!$proc.HasExited) {
+                            $proc | Stop-Process -Force
+                        }
+                        if ($debug -eq 1) {
+                            Write-Host "Ventana cerrada: $($proc.MainWindowTitle)" -ForegroundColor Red
+                        }
+                    } catch {
+                        if ($debug -eq 1) {
+                            Write-Host "Error al cerrar ventana: $_" -ForegroundColor Yellow
+                        }
+                    }
+                }
             }
         }
     }

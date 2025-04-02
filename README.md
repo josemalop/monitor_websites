@@ -15,6 +15,7 @@ La configuraci&oacute;n de los distintos parametros se realiza en el fichero de 
     - Se modifica el texto a grabar en el log.
     - Se incluye la escritura del mensaje en el visor de eventos.
 - **v0.5**. Se mejora la salida del modo debug.
+- **v0.6**. Se incluye opci&oacute;n para cerrar las ventanas detectadas.
 
 ### Descripci&oacute;n de las monitorizaciones.
 
@@ -23,7 +24,7 @@ Cada vez que se detecte que hay una ventana o pesta&ntilde;a abierta cuyo t&iacu
 - Una l&iacute;nea en un fichero de log `log.txt`ubicado en la misma ruta del script.
 - Un evento en el visor de eventos con el contenido de la alerta.
 
-El formato de mensaje es: `Equipo: nombre_equipo - IP: direcc&oacute;n IP - Usuario: Usuario conectado al equipo - Web: Sitioweb detectado`.
+El formato de mensaje es: `Equipo: nombre_equipo - IP: direccion IP - Usuario: Usuario conectado al equipo - Web: Sitioweb detectado`.
 
 En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`.
 
