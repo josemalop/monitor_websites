@@ -45,10 +45,10 @@ En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`
 
 ### Convertir el script a servicio de Windows
 
-**1. Descargar e instalar NSSM**
+**1. Instalar Chocolatey y NSSM**
 
-- Descarga NSSM desde su sitio oficial: https://nssm.cc/download.
-- Extrae el archivo ZIP descargado en una carpeta de tu elecci&oacute;n (por ejemplo, `C:\nssm`).
+- Instala **Chocolatey** ejecutando lo siguiente desde una ventana de **Powershell** como administrador del equipo: `Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))`.
+- En la misma ventana de **Powershell**, instala **nssm** ejecutando: `choco -y install nssm`.
 
 **2. Preparar el script de PowerShell**
 
@@ -59,17 +59,16 @@ En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`
 **3. Crear el servicio con NSSM**
 
 - Abre una ventana de Command Prompt (`cmd`) o PowerShell como administrador.
-- Ve a la carpeta donde extrajiste NSSM. Por ejemplo: `cd C:\nssm`
 - Ejecuta el siguiente comando para abrir la interfaz gr&aacute;fica de NSSM: `nssm install MonitorWebsites` (Reemplaza *MonitorWebsites* con el nombre que desees para tu servicio).
-- En la ventana de NSSM que aparece, configura los siguientes campos:
-    - **Path**: Ruta al ejecutable de PowerShell. Normalmente es: `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`
-    - **Startup directory**: Ruta a la carpeta donde est&aacute; tu script. Por ejemplo: `C:\scripts`
-    - **Arguments**: Argumentos para ejecutar el script. Por ejemplo: `-ExecutionPolicy Bypass -File "C:\scripts\monitor_websites.ps1"`
-    - La configuraci&oacute;n deber&iacute;a verse as&iacute;:
-        - **Path**: `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`
-        - **Startup directory**: `C:\scripts`
-        - **Arguments**: `-ExecutionPolicy Bypass -File "C:\scripts\monitor_websites.ps1"`
-    - Haz clic en Install service. Esto crear&aacute; el servicio en Windows.
+- En la ventana "NSSM service installer" que aparecer&aacute;, configura los siguientes campos:
+    - En la pesta&ntilde;a **Application**:
+        - **Path**: Ruta al ejecutable de PowerShell. Normalmente es: `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe` (busca la ruta correcta en tu sistema).
+        - **Startup directory**: Ruta a la carpeta donde est&aacute; el script. Por ejemplo: `C:\scripts`
+        - **Arguments**: Argumentos para ejecutar el script. Por ejemplo: `-ExecutionPolicy Bypass -File "C:\scripts\monitor_websites.ps1"`
+    - En la pesta&ntilde;a **Log on**:
+        - **This account**: Introduce el usuario administrador del equipo (normalmente ser&aacute; "Administrador" o "Administrator").
+        - **Password**: La contrase&ntilde;a del usuario administrador (hay que ponerla dos veces).
+- Haz clic en **Install service**. Esto crear&aacute; el servicio en Windows.
 
 **4. Configurar el servicio (opcional)**
 
