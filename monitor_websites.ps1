@@ -156,8 +156,8 @@ while ($true) {
 
             # Registramos la fecha, hora y el sitio web en el archivo de log
             $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            $mensaje = "Equipo: $hostname - IP: $direccionIp - Usuario: $usuario - Web: $site"
-            $logMessage = "[$timestamp] - $mensaje - Accion: $(if ($cerrarVentanas -eq 1) {'Ventana cerrada'} else {'Detectada'})"
+            $mensaje = "Equipo: $hostname - IP: $direccionIp - Usuario: $usuario - Web: $site - Accion: $(if ($cerrarVentanas -eq 1) {'Ventana cerrada'} else {'Detectada'})"
+            $logMessage = "[$timestamp] - $mensaje"
             Add-Content -Path $logFile -Value $logMessage
             
             # Verificamos/creamos la fuente de eventos
