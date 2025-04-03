@@ -124,8 +124,8 @@ while ($true) {
     if ( $debug -eq 1 -and $configmostrada -eq 0 ) {
         Write-Host "Configuracion cargada:"
         Write-Host "Tiempo de espera: $waitTime segundos."
-        Write-Host "$(if ($sonar -eq 1) {'Se reproducira un sonido de $frecSonido Hz con una duracion de $duracSonido ms.'} else {'No se reproducira ningun sonido.'})"
-        Write-Host "Cerrar ventanas: $(if ($cerrarVentanas -eq 1) {'Habilitado'} else {'Deshabilitado'})."
+        Write-Host "$(if ($sonar -eq 1) {"Se reproducira un sonido de $frecSonido Hz con una duracion de $duracSonido ms."} else {"No se reproducira ningun sonido."})"
+        Write-Host "$(if ($cerrarVentanas -eq 1) {'Se cerraran las ventanas destectadas.'} else {'No se cerraran las ventanas destectadas.'})"
         Write-Host "Sitios web a monitorizar:"
         $websites | ForEach-Object { Write-Host "- $_" }
         $configmostrada = 1
