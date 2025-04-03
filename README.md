@@ -3,7 +3,7 @@
 
 Script que monitoriza ventanas abiertas alertando y/o cerrando la ventana implicada con el texto especificado en el t&iacute;tulo. Cre&eacute; este script con la idea de controlar y/o restringir el uso de la IA en las aulas de inform&aacute;tica. Usa este script bajo tu propia responsabilidad.
 
-La configuraci&oacute;n de los distintos parametros se realiza en el fichero de configuraci&oacute;n `config.ini` y no es preciso reiniciar el script si se modifica, se relee de forma autom&aacute;tica.
+La configuraci&oacute;n de los distintos parametros se realiza con un fichero `config.ini` ubicado en la misma ruta del script y no es preciso reiniciar nada si se modifica este archivo ya que se relee de forma autom&aacute;tica, facilitando as&iacute; las modificaciones. Lo ideal es que el aula est&eacute; configurada de forma que se pueda distribuir el fichero de configuraci&oacute;n desde el ordenador del profesor con un `robocopy` o similar.
 
 ### Changelog:
 - **v0.1**. Versi&oacute;n inicial.
