@@ -17,6 +17,11 @@ La configuraci&oacute;n de los distintos parametros se realiza en el fichero de 
 - **v0.5**. Se mejora la salida del modo debug.
 - **v0.6**. Se incluye opci&oacute;n para cerrar las ventanas detectadas.
 
+### Pruebas de ejecuci&oacute;n
+
+Para probar la ejecuci&oacute;n del script, tienes que abrir una ventana de **Powershell** como administrador del equipo y ejecutar:
+`Set-ExecutionPolicy -ExecutionPolicy Bypass`
+
 ### Descripci&oacute;n de las monitorizaciones.
 
 Cada vez que se detecte que hay una ventana o pesta&ntilde;a abierta cuyo t&iacute;tulo coincida con alg&uacute;n valor de los definidos en el array *"Sitioweb"*, se grabar&aacute;:
