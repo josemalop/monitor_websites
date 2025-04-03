@@ -75,10 +75,9 @@ En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`
 - Presiona Win + R, escribe services.msc`` y presiona Enter.
 - Busca el servicio que acabas de crear (por ejemplo, *MonitorWebsites*).
 - Haz clic derecho sobre el servicio y selecciona Propiedades.
-- En la pesta&ntilde;a General, puedes configurar:
-    - **Tipo de inicio**: Selecciona *"Autom&aacute;tico"* para que el servicio se inicie con Windows.
-    - **Acciones ante errores**: Configura c&oacute;mo debe comportarse el servicio si falla.
-- Haz clic en Aplicar y luego en Aceptar.
+    - En la pesta&ntilde;a **General**, configura el **Tipo de inicio** a: *"Autom&aacute;tico"* para que el servicio se inicie con Windows.
+    - En la pesta&ntilde;a **Recuperaci&oacute;n**, configura para todos los errores **Reiniciar el servicio** para que el servicio se reinicie si hay alg&uacute;n fallo.
+- Haz clic en **Aplicar**, ve a la pesta&ntilde;a **General**, pulsa en **Iniciar** y luego en **Aceptar**.
 
 **5. Iniciar y probar el servicio**
 
