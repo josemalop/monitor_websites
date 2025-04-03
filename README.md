@@ -28,7 +28,7 @@ Cada vez que se detecte que hay una ventana o pesta&ntilde;a abierta cuyo t&iacu
 - Una l&iacute;nea en un fichero de log `log.txt`ubicado en la misma ruta del script.
 - Un evento en el visor de eventos con el contenido de la alerta.
 
-El formato de mensaje es: `Equipo: nombre_equipo - IP: direccion IP - Usuario: Usuario conectado al equipo - Web: Sitioweb detectado`.
+El formato de mensaje es: `Equipo: nombre_equipo - IP: direccion IP - Usuario: Usuario conectado al equipo - Web: Sitioweb detectado - Accion: Ventana cerrada/Detectada`.
 
 En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`.
 
