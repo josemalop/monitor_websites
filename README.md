@@ -15,7 +15,7 @@ La configuraci&oacute;n de los distintos parametros se realiza en el fichero de 
     - Se modifica el texto a grabar en el log.
     - Se incluye la escritura del mensaje en el visor de eventos.
 - **v0.5**. Se mejora la salida del modo debug.
-- **v0.6**. Se incluye opci&oacute;n para cerrar las ventanas detectadas.
+- **v0.6**. Se incluye opci&oacute;n para cerrar las ventanas detectadas. **Ojo, no se cierra la pesta&ntilde;a afectada, sino la ventana completa del navegador.**
 
 ### Pruebas de ejecuci&oacute;n
 
@@ -73,7 +73,7 @@ En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`
 **4. Configurar el servicio (opcional)**
 
 - Abre el Administrador de servicios de Windows:
-- Presiona Win + R, escribe services.msc y presiona Enter.
+- Presiona Win + R, escribe services.msc`` y presiona Enter.
 - Busca el servicio que acabas de crear (por ejemplo, *MonitorWebsites*).
 - Haz clic derecho sobre el servicio y selecciona Propiedades.
 - En la pesta&ntilde;a General, puedes configurar:
@@ -91,9 +91,4 @@ En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`
 - Detener el servicio: En el Administrador de servicios, haz clic derecho sobre el servicio y selecciona **Detener**.
 - Eliminar el servicio:
     - Abre una ventana de Command Prompt (`cmd`) o PowerShell como administrador.
-    - Ve a la carpeta de NSSM: `cd C:\nssm`
     - Ejecuta el siguiente comando: `nssm remove MonitorWebsites confirm` (Reemplaza MonitorWebsites con el nombre de tu servicio).
-
-### To-Do
-
-- Opci&oacute;n para cerrar la ventana en lugar de notificar.
