@@ -1,7 +1,7 @@
 # Monitor de Websites
 ## &copy;2025 Josema
 
-Script que monitoriza ventanas abiertas alertando y/o cerrando la ventana implicada con el texto especificado en el t&iacute;tulo.
+Script que monitoriza ventanas abiertas alertando y/o cerrando la ventana implicada con el texto especificado en el t&iacute;tulo. Cre&eacute; este script con la idea de controlar y/o restringir el uso de la IA en las aulas de inform&aacute;tica. Usa este script bajo tu propia responsabilidad.
 
 La configuraci&oacute;n de los distintos parametros se realiza en el fichero de configuraci&oacute;n `config.ini` y no es preciso reiniciar el script si se modifica, se relee de forma autom&aacute;tica.
 
