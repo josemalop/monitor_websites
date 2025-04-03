@@ -77,6 +77,10 @@ function Get-IniContent {
 
 # Bucle principal de monitorizacion
 while ($true) {
+    # Mostramos mensaje si estamos en modo debug
+    if ($debug -eq 1 ) {
+        Write-Host "Monitorizando..."
+    }
 
     # Leemos la configuracion
     $iniContent = Get-IniContent -filePath $configFile
