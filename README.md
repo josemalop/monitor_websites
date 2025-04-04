@@ -42,7 +42,7 @@ En el fichero de log todos los mensajes ir&aacute;n precedidos de un `timestamp`
 - **DuracSonido**. *Por defecto a 1000*. La duraci&oacute;n del sonido en milisegundos.
 - **Sitioweb**. *Por defecto vacio*. Este campo se puede repetir, sirve para crear un array con los sitios a monitorizar.
 
-### Convertir el script a servicio de Windows
+### Convertir el script a servicio de Windows. AVISO: ¡¡¡Al convertir el script a servicio, no funciona todav&iacute;a!!!
 
 **1. Instalar Chocolatey y NSSM**
 
