@@ -1,142 +1,98 @@
 <##############################################################################
-Monitor de Websites v0.7 - Versión para Servicio Windows
+Monitor de Websites v0.7 - Versión Servicio Funcional
 (c)2025 Josema
 ##############################################################################>
 
-# Configuración de logging
-$logDirectory = "C:\Logs\WebsiteMonitor"
-$logFile = Join-Path -Path $logDirectory -ChildPath "website_monitor.log"
-$configFile = Join-Path -Path $PSScriptRoot -ChildPath "config.ini"
+# Configuración inicial
+$global:logPath = Join-Path $PSScriptRoot "service.log"
+$global:configPath = Join-Path $PSScriptRoot "config.ini"
 
-# Crear directorio de logs si no existe
-if (-not (Test-Path -Path $logDirectory)) {
-    New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
-}
-
-# Iniciar logging
-Start-Transcript -Path $logFile -Append -IncludeInvocationHeader
-
-# Función para escribir en el log
+# Función de logging mejorada
 function Write-ServiceLog {
-    param(
-        [string]$message,
-        [string]$level = "INFO"
-    )
-    
+    param([string]$message, [string]$level="INFO")
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logEntry = "[$timestamp] [$level] $message"
-    Add-Content -Path $logFile -Value $logEntry
+    Add-Content -Path $global:logPath -Value $logEntry
 }
 
-# Función para leer archivos INI
-function Get-IniContent {
-    param(
-        [string]$filePath
-    )
-    
-    $ini = @{}
-    $section = "NO_SECTION"
-    
-    if (Test-Path $filePath) {
-        $lines = Get-Content -Path $filePath
-        
-        foreach ($line in $lines) {
-            $line = $line.Trim()
-            
-            if ($line -eq "" -or $line.StartsWith(";") -or $line.StartsWith("#")) {
-                continue
-            }
-            
-            if ($line.StartsWith("[") -and $line.EndsWith("]")) {
-                $section = $line.Substring(1, $line.Length - 2)
-                $ini[$section] = @{}
-                continue
-            }
-            
-            $keyValue = $line -split "=", 2
-            if ($keyValue.Count -eq 2) {
-                $key = $keyValue[0].Trim()
-                $value = $keyValue[1].Trim()
-                
-                if ($section -eq "Monitor" -and $key -eq "Sitioweb") {
-                    if (-not $ini[$section][$key]) {
-                        $ini[$section][$key] = @()
-                    }
-                    $ini[$section][$key] += $value
-                } else {
-                    $ini[$section][$key] = $value
-                }
-            }
-        }
-    }
-    return $ini
-}
-
-# Función para obtener el usuario activo
-function Get-ActiveUser {
+# Función para obtener procesos de usuario
+function Get-UserProcesses {
     try {
-        $session = quser | Where-Object { $_ -match '^\s*>' -or $_ -match '^\s* ' }
-        if ($session) {
-            $sessionParts = $session -split '\s+'
-            return $sessionParts[1]
+        # Obtener la sesión activa
+        $sessionInfo = quser | Where-Object { $_ -match '>' }
+        if (-not $sessionInfo) {
+            Write-ServiceLog "No se encontró sesión de usuario activa" "WARNING"
+            return $null
         }
-        return "SYSTEM"
+
+        $sessionId = ($sessionInfo -split '\s+')[2]
+        $username = ($sessionInfo -split '\s+')[1]
+
+        # Obtener procesos del usuario
+        $processes = Get-Process -IncludeUserName | Where-Object {
+            $_.SessionId -eq $sessionId -and $_.MainWindowTitle -ne ""
+        }
+
+        return @{
+            Processes = $processes
+            Username = $username
+            SessionId = $sessionId
+        }
     } catch {
-        return "UNKNOWN"
+        Write-ServiceLog "Error al obtener procesos: $_" "ERROR"
+        return $null
     }
 }
 
 # Función principal de monitoreo
-function Start-WebsiteMonitoring {
+function Invoke-WebsiteMonitoring {
     param(
-        [int]$waitTime,
         [array]$websites,
-        [int]$cerrarVentanas,
-        [int]$debug
+        [int]$closeWindows,
+        [int]$waitTime
     )
-    
-    $hostname = hostname
-    $ipconfig = Get-NetIPConfiguration
-    $direccionIp = $ipconfig.IPv4Address.IPAddress
-    $usuario = Get-ActiveUser
 
-    # Obtenemos los procesos con ventanas abiertas del usuario activo
-    try {
-        $activeSessionId = (Get-Process -Name explorer -IncludeUserName).SessionId | Select-Object -First 1
-        $processes = Get-Process -IncludeUserName | Where-Object { 
-            $_.SessionId -eq $activeSessionId -and $_.MainWindowTitle -ne "" 
-        }
-    } catch {
-        Write-ServiceLog "Error al obtener procesos: $_" -level "ERROR"
-        return
+    $hostInfo = @{
+        Hostname = $env:COMPUTERNAME
+        IPAddress = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notlike "*Loopback*" }).IPAddress
     }
 
-    foreach ($site in $websites) {
-        $matchingProcesses = $processes | Where-Object { $_.MainWindowTitle -match $site }
-        
-        if ($matchingProcesses) {
-            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            $mensaje = "Equipo: $hostname - IP: $direccionIp - Usuario: $usuario - Web: $site - Accion: $(if ($cerrarVentanas -eq 1) {'Ventana cerrada'} else {'Detectada'})"
-            
-            Write-ServiceLog $mensaje
-            
-            # Escribimos en el Visor de Eventos
-            if (-not [System.Diagnostics.EventLog]::SourceExists("MonitorWebsites")) {
-                New-EventLog -LogName "Application" -Source "MonitorWebsites"
-            }
-            Write-EventLog -LogName "Application" -Source "MonitorWebsites" -EntryType "Information" -EventId 1 -Message $mensaje
+    $userProcesses = Get-UserProcesses
+    if (-not $userProcesses) { return }
 
-            if ($cerrarVentanas -eq 1) {
+    foreach ($site in $websites) {
+        $matchingProcesses = $userProcesses.Processes | Where-Object { 
+            $_.MainWindowTitle -match $site -or $_.ProcessName -match "chrome|firefox|edge|iexplore"
+        }
+
+        if ($matchingProcesses) {
+            $logMessage = "Detección: Host: $($hostInfo.Hostname) | IP: $($hostInfo.IPAddress) | " +
+                          "Usuario: $($userProcesses.Username) | Sitio: $site"
+            
+            Write-ServiceLog $logMessage
+
+            # Registrar en el visor de eventos
+            try {
+                if (-not [System.Diagnostics.EventLog]::SourceExists("WebsiteMonitor")) {
+                    New-EventLog -LogName "Application" -Source "WebsiteMonitor"
+                }
+                Write-EventLog -LogName "Application" -Source "WebsiteMonitor" -EventId 1001 -EntryType Information -Message $logMessage
+            } catch {
+                Write-ServiceLog "Error al escribir en EventLog: $_" "ERROR"
+            }
+
+            # Cerrar ventanas si está configurado
+            if ($closeWindows -eq 1) {
                 foreach ($proc in $matchingProcesses) {
                     try {
-                        $proc.CloseMainWindow() | Out-Null
-                        Start-Sleep -Milliseconds 500
-                        if (!$proc.HasExited) {
-                            $proc | Stop-Process -Force
+                        if (-not $proc.CloseMainWindow()) {
+                            Stop-Process -Id $proc.Id -Force
+                            Write-ServiceLog "Proceso $($proc.Name) forzado a cerrar (PID: $($proc.Id))"
+                        } else {
+                            Write-ServiceLog "Ventana $($proc.MainWindowTitle) cerrada correctamente"
                         }
-                        Write-ServiceLog "Ventana cerrada: $($proc.MainWindowTitle)"
                     } catch {
-                        Write-ServiceLog "Error al cerrar ventana: $_" -level "ERROR"
+                        Write-ServiceLog "Error al cerrar proceso $($proc.Name): $_" "ERROR"
                     }
                 }
             }
@@ -144,55 +100,61 @@ function Start-WebsiteMonitoring {
     }
 }
 
-# Bucle principal del servicio
+# Carga de configuración
+function Get-ServiceConfig {
+    try {
+        if (-not (Test-Path $global:configPath)) {
+            Write-ServiceLog "Archivo de configuración no encontrado" "ERROR"
+            return $null
+        }
+
+        $config = @{
+            Websites = @()
+            WaitTime = 15
+            CloseWindows = 0
+            Debug = 0
+        }
+
+        $content = Get-Content $global:configPath
+        foreach ($line in $content) {
+            if ($line -match "^\s*Sitioweb\s*=\s*(.+)")) {
+                $config.Websites += $matches[1].Trim()
+            }
+            elseif ($line -match "^\s*TiempoEspera\s*=\s*(\d+)")) {
+                $config.WaitTime = [int]$matches[1]
+            }
+            elseif ($line -match "^\s*CerrarVentanas\s*=\s*(\d+)")) {
+                $config.CloseWindows = [int]$matches[1]
+            }
+            elseif ($line -match "^\s*Debug\s*=\s*(\d+)")) {
+                $config.Debug = [int]$matches[1]
+            }
+        }
+
+        return $config
+    } catch {
+        Write-ServiceLog "Error al leer configuración: $_" "ERROR"
+        return $null
+    }
+}
+
+# Punto de entrada del servicio
 try {
-    Write-ServiceLog "Iniciando servicio de monitorización de websites"
-    
-    # Valores por defecto
-    $debug = 0
-    $waitTime = 15
-    $websites = @()
-    $cerrarVentanas = 0
-    $configLoaded = $false
+    Write-ServiceLog "=== Iniciando servicio de monitorización ==="
 
     while ($true) {
-        # Leemos la configuración
-        $iniContent = Get-IniContent -filePath $configFile
-
-        if ($iniContent.ContainsKey("Monitor")) {
-            $settings = $iniContent["Monitor"]
-
-            $debug = [int]($settings["Debug"] ?? 0)
-            $waitTime = [int]($settings["TiempoEspera"] ?? 15)
-            $cerrarVentanas = [int]($settings["CerrarVentanas"] ?? 0)
-            
-            if ($settings.ContainsKey("Sitioweb")) {
-                $websites = $settings["Sitioweb"]
-            }
-
-            if (-not $configLoaded) {
-                Write-ServiceLog "Configuración cargada:"
-                Write-ServiceLog "Tiempo de espera: $waitTime segundos"
-                Write-ServiceLog "Cerrar ventanas: $(if ($cerrarVentanas -eq 1) {'Activado'} else {'Desactivado'})"
-                Write-ServiceLog "Sitios web a monitorizar: $($websites -join ', ')"
-                $configLoaded = $true
-            }
+        $config = Get-ServiceConfig
+        if ($config -and $config.Websites.Count -gt 0) {
+            Invoke-WebsiteMonitoring -websites $config.Websites -closeWindows $config.CloseWindows -waitTime $config.WaitTime
         } else {
-            Write-ServiceLog "No se encontró la sección Monitor en el archivo de configuración" -level "WARNING"
+            Write-ServiceLog "Configuración inválida o no hay sitios para monitorizar" "WARNING"
         }
 
-        if ($websites.Count -gt 0) {
-            Start-WebsiteMonitoring -waitTime $waitTime -websites $websites -cerrarVentanas $cerrarVentanas -debug $debug
-        } else {
-            Write-ServiceLog "No hay sitios web configurados para monitorizar" -level "WARNING"
-        }
-
-        Start-Sleep -Seconds $waitTime
+        Start-Sleep -Seconds ($config ? $config.WaitTime : 15)
     }
 } catch {
-    Write-ServiceLog "Error crítico en el servicio: $_" -level "ERROR"
-    throw
+    Write-ServiceLog "ERROR CRÍTICO: $_" "ERROR"
+    Write-ServiceLog "Stack Trace: $($_.ScriptStackTrace)" "ERROR"
 } finally {
-    Write-ServiceLog "Servicio de monitorización detenido"
-    Stop-Transcript
+    Write-ServiceLog "=== Servicio detenido ==="
 }
